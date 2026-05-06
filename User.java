@@ -1,20 +1,33 @@
 public abstract class User {
-    public int User_ID;
-    public String User_Name;
-    public String User_Username;
-    public int User_Password;
-    public int User_PhoneNumber;
-    public Appointment[] ListAppointment;
 
-    public User(int user_ID,String User_Name,String User_Username,
-                int User_Password,int User_PhoneNumber,Appointment[] listAppointment) {
-        this.User_ID = user_ID;
-        this.User_Name = User_Name;
-        this.User_Username=User_Username;
-        this.User_Password=User_Password;
-        this.User_PhoneNumber=User_PhoneNumber;
-        this.ListAppointment = listAppointment;
+    protected String id;
+    protected String name;
+    protected String username;
+    protected String password;
+    protected String phone;
+    protected String role;
+
+    public User(String name, String username,
+                String password, String phone, String role) {
+
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.phone = phone;
+        this.role = role;
     }
-    public abstract void ViewPersonalInfo();
-    public abstract void ViewAppointments();
+
+    public abstract void viewPersonalInfo();
+    public abstract void viewAppointments();
+
+    public String userToCSV() {
+        return String.join(",",
+                id,
+                name,
+                username,
+                password,
+                phone,
+                role
+        );
+    }
 }

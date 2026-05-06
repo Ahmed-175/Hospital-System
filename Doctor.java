@@ -1,31 +1,57 @@
-public class Doctor extends User{
 
-    public String Specialization;
-    public String Department;
-    public Patient[] ListPatient;
+import java.util.*;
 
-    public Doctor(int user_ID,String User_Name,String User_Username,int User_Password,
-                  int User_PhoneNumber,Appointment[] listAppointment,String specialization,
-                  String department,Patient[] listPatient)
-    {
-        super(user_ID, User_Name, User_Username, User_Password, User_PhoneNumber,listAppointment);
-        this.Department = department;
-        this.ListPatient = listPatient;
-        this.Specialization = specialization;
+public class Doctor extends User {
+
+    private String specialization;
+    private String department;
+    private List<Patient> patients;
+    private List<Appointment> appointments;
+
+    public Doctor(String name, String username,
+                  String password, String phone,
+                  String specialization, String department) {
+
+        super(name, username, password, phone, "DOCTOR");
+
+        this.id = FileManager.generateId("doctors");
+        this.specialization = specialization;
+        this.department = department;
+        this.patients = new ArrayList<>();
+        this.appointments = new ArrayList<>();
+
+        FileManager.save("doctors", this.toCSV());
+        FileManager.save("users", this.userToCSV());
+    }
+
+    // Convert Doctor to CSV
+    public String toCSV() {
+        return String.join(",",
+                id,
+                name,
+                username,
+                password,
+                specialization,
+                department,
+                phone
+        );
     }
 
     @Override
-    public void ViewPersonalInfo(){
-
+    public void viewPersonalInfo() {
+        System.out.println("=== Doctor Info ===");
+        System.out.println("ID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Username: " + username);
+        System.out.println("Specialization: " + specialization);
+        System.out.println("Department: " + department);
+        System.out.println("Phone: " + phone);
     }
+
     @Override
-    public void ViewAppointments(){
-
-    }
-    public void ViewAssignedPatients(){
-
-    }
-    public void UpdateAppointments_Status(){
-        //Confirmed,Completed.Cancelled
+    public void viewAppointments() {
+        for (Appointment a : appointments) {
+            System.out.println(a);
+        }
     }
 }

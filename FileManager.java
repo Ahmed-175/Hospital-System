@@ -1,20 +1,137 @@
+
+import java.io.*;
+import java.util.*;
+
 public class FileManager {
-    public static void LoadData(){
-
+    private static final String DB_FOLDER = "database";
+    static {
+        initDatabase();
     }
-    public static void SaveData(){
-
+    private static void initDatabase() {
+        File folder = new File(DB_FOLDER);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+        createFile("users.txt");
+        createFile("doctors.txt");
+        createFile("patients.txt");
+        createFile("appointments.txt");
     }
-    //need:
-        //Create text files such as:
-        //• doctors.txt
-        //• patients.txt
-        //• appointments.txt
-        //• users.txt
-    //and
-        //• Read data from files when the program starts.
-        //• Save data to files after adding doctors, patients, or appointments.
-        //• Update files when appointments are cancelled or updated.
-        //• Handle missing or empty files using exception handling.
+
+    private static void createFile(String fileName) {
+        try {
+            File file = new File(DB_FOLDER + "/" + fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (Exception e) {
+            System.out.println("Error creating file: " + fileName);
+        }
+    }
+
+    private static File getFile(String collection) {
+        return new File(DB_FOLDER + "/" + collection + ".txt");
+    }
+
+    public static List<String> findAll(String collection) {
+        List<String> data = new ArrayList<>();
+
+        try (Scanner scanner = new Scanner(getFile(collection))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (!line.isEmpty()) {
+                    data.add(line);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error reading " + collection);
+        }
+
+        return data;
+    }
+
+    public static String findById(String collection, String id) {
+        List<String> data = findAll(collection);
+
+        for (String line : data) {
+            if (line.startsWith(id + ",")) {
+                return line;
+            }
+        }
+        return null;
+    }
+
+    public static void save(String collection, String record) {
+        try (FileWriter fw = new FileWriter(getFile(collection), true); BufferedWriter bw = new BufferedWriter(fw)) {
+
+            bw.write(record);
+            bw.newLine();
+
+        } catch (Exception e) {
+            System.out.println("Error saving to " + collection);
+        }
+    }
+
+    public static void update(String collection, String id, String newRecord) {
+        List<String> data = findAll(collection);
+
+        try (PrintWriter writer = new PrintWriter(getFile(collection))) {
+
+            for (String line : data) {
+                if (line.startsWith(id + ",")) {
+                    writer.println(newRecord);
+                } else {
+                    writer.println(line);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error updating " + collection);
+        }
+    }
+
+    public static void delete(String collection, String id) {
+        List<String> data = findAll(collection);
+
+        try (PrintWriter writer = new PrintWriter(getFile(collection))) {
+
+            for (String line : data) {
+                if (!line.startsWith(id + ",")) {
+                    writer.println(line);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error deleting from " + collection);
+        }
+    }
+
+   public static String generateId(String collection) {
+    List<String> data = findAll(collection);
+
+    char prefixChar = Character.toUpperCase(collection.charAt(0));
+    String prefix = String.valueOf(prefixChar);
+
+
+     System.out.println(prefix);
+
+    int max = 0;
+
+    for (String line : data) {
+        try {
+            String id = line.split(",")[0];
+
+            if (id.startsWith(prefix)) {
+                int num = Integer.parseInt(id.substring(1));
+                if (num > max) {
+                    max = num;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    return prefix + String.format("%03d", max + 1);
+}
 
 }
