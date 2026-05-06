@@ -3,10 +3,13 @@ import java.io.*;
 import java.util.*;
 
 public class FileManager {
+
     private static final String DB_FOLDER = "database";
+
     static {
         initDatabase();
     }
+
     private static void initDatabase() {
         File folder = new File(DB_FOLDER);
         if (!folder.exists()) {
@@ -35,7 +38,6 @@ public class FileManager {
 
     public static List<String> findAll(String collection) {
         List<String> data = new ArrayList<>();
-
         try (Scanner scanner = new Scanner(getFile(collection))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
@@ -106,32 +108,10 @@ public class FileManager {
         }
     }
 
-   public static String generateId(String collection) {
-    List<String> data = findAll(collection);
-
-    char prefixChar = Character.toUpperCase(collection.charAt(0));
-    String prefix = String.valueOf(prefixChar);
-
-
-     System.out.println(prefix);
-
-    int max = 0;
-
-    for (String line : data) {
-        try {
-            String id = line.split(",")[0];
-
-            if (id.startsWith(prefix)) {
-                int num = Integer.parseInt(id.substring(1));
-                if (num > max) {
-                    max = num;
-                }
-            }
-        } catch (Exception ignored) {
-        }
+    public static String generateId(String collection) {
+        List<String> data = findAll(collection);
+        String prefix = String.valueOf(collection.charAt(0)).toUpperCase();
+        return prefix + String.format("%03d", (data.size() + 1));
     }
-
-    return prefix + String.format("%03d", max + 1);
-}
 
 }

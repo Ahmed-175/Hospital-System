@@ -9,22 +9,21 @@ public class Doctor extends User {
     private List<Appointment> appointments;
 
     public Doctor(String name, String username,
-                  String password, String phone,
-                  String specialization, String department) {
+            String password, String phone,
+            String specialization, String department) {
 
         super(name, username, password, phone, "DOCTOR");
 
         this.id = FileManager.generateId("doctors");
         this.specialization = specialization;
         this.department = department;
-        this.patients = new ArrayList<>();
-        this.appointments = new ArrayList<>();
+        // this.patients;
+        // this.appointments;Z
 
         FileManager.save("doctors", this.toCSV());
         FileManager.save("users", this.userToCSV());
     }
 
-    // Convert Doctor to CSV
     public String toCSV() {
         return String.join(",",
                 id,
@@ -35,6 +34,20 @@ public class Doctor extends User {
                 department,
                 phone
         );
+    }
+
+    public static Doctor fromCSV(String record) {
+        String[] data = record.split(",");
+        Doctor doctor = new Doctor(
+                data[1], // name
+                data[2], // username
+                data[3], // password
+                data[6], // phone
+                data[4], // specialization
+                data[5] // department
+        );
+        doctor.setId(data[0]);
+        return doctor;
     }
 
     @Override
@@ -53,5 +66,13 @@ public class Doctor extends User {
         for (Appointment a : appointments) {
             System.out.println(a);
         }
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public String getDepartment() {
+        return department;
     }
 }

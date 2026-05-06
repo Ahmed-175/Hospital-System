@@ -1,4 +1,3 @@
 D001,Ahmed Farag,ahmed175,1234,General Medicine,Internal Medicine Department,01023235534
-D002,Ali,test175,1234,General Medicine,Internal Medicine Department,01023235534
-D003,Ahmed Farag,ahmed175,1234,General Medicine,Internal Medicine Department,01023235534
-D004,Ali,test175,1234,General Medicine,Internal Medicine Department,01023235534
+D002,Ali Hassan,ali175,1234,Cardiology,Heart Department,01098765432
+D003,Sara Mohamed,sara90,1234,Neurology,Brain & Nerves Department,01055544332

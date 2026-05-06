@@ -1,34 +1,80 @@
-public class Patient extends User{
 
-    public int Age;
-    public String Gender;
-    public Doctor AssignedDoctor;
+public class Patient extends User {
 
-    public Patient(int user_ID, String User_Name, String User_Username,
-                   int User_Password, int User_PhoneNumber, Appointment[] listAppointment,
-                   int age, Doctor assignedDoctor, String gender)
-    {
-        super(user_ID, User_Name, User_Username,User_Password, User_PhoneNumber,listAppointment);
-        this.Age = age;
-        this.AssignedDoctor = assignedDoctor;
-        this.Gender = gender;
+    private int age;
+    private String gender;
+    private String doctorId;
+
+    public Patient(String name, String username,
+            String password, String phone,
+            int age, String gender, String doctorId) {
+
+        super(name, username, password, phone, "PATIENT");
+        this.id = FileManager.generateId("patients");
+
+        this.age = age;
+        this.gender = gender;
+        this.doctorId = doctorId;
+        FileManager.save("patients", this.toCSV());
+        FileManager.save("users", this.userToCSV());
+
+    }
+
+    public static Patient fromCSV(String record) {
+
+        String[] data = record.split(",");
+        Patient patient = new Patient(
+                data[1], // name
+                data[2], // username
+                data[3], // password
+                data[4], // phone
+                Integer.parseInt(data[5]), // age
+                data[6], // gender
+                data[7] // doctorId
+        );
+
+        patient.setId(data[0]);
+
+        return patient;
+    }
+
+    public String toCSV() {
+        return String.join(",",
+                id,
+                name,
+                username,
+                password,
+                phone,
+                String.valueOf(age),
+                gender,
+                doctorId
+        );
     }
 
     @Override
-    public void ViewPersonalInfo() {
-
+    public void viewPersonalInfo() {
+        System.out.println("=== Patient Info ===");
+        System.out.println("ID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Username: " + username);
+        System.out.println("Age: " + age);
+        System.out.println("Gender: " + gender);
     }
+
     @Override
-    public void ViewAppointments() {
-
+    public void viewAppointments() {
     }
-    public void ViewAssignedDoctor(){
 
+    public void viewAssignedDoctor() {
     }
-    public void Book_AppointmentWithAssi_Doctor(){
 
+    public void bookAppointmentWithDoctor() {
     }
-    public void Cancel_AppointmentWithAssi_Doctor(){
 
+    public void cancelAppointmentWithDoctor() {
+    }
+
+    public String getDoctorId() {
+        return doctorId;
     }
 }
