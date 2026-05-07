@@ -1,24 +1,22 @@
-
 import java.util.*;
-
 public class Doctor extends User {
 
     private String specialization;
     private String department;
-    private List<Patient> patients;
-    private List<Appointment> appointments;
+    private List<String> patients;
+    private List<String> appointments;
 
     public Doctor(String name, String username,
-            String password, String phone,
-            String specialization, String department) {
+                  String password, String phone,
+                  String specialization, String department) {
 
         super(name, username, password, phone, "DOCTOR");
 
         this.id = FileManager.generateId("doctors");
         this.specialization = specialization;
         this.department = department;
-        // this.patients;
-        // this.appointments;Z
+        this.patients = FileManager.findAll("patients");
+        this.appointments = FileManager.findAll("appointments");
 
         FileManager.save("doctors", this.toCSV());
         FileManager.save("users", this.userToCSV());
@@ -44,7 +42,7 @@ public class Doctor extends User {
                 data[3], // password
                 data[6], // phone
                 data[4], // specialization
-                data[5] // department
+                data[5]  // department
         );
         doctor.setId(data[0]);
         return doctor;
@@ -60,19 +58,68 @@ public class Doctor extends User {
         System.out.println("Department: " + department);
         System.out.println("Phone: " + phone);
     }
-
     @Override
     public void viewAppointments() {
-        for (Appointment a : appointments) {
-            System.out.println(a);
+        System.out.println("=== My Appointments ===");
+        boolean found = false;
+
+        for (String record : appointments) {
+            String[] data = record.split(",");
+
+            // A001,P001,D001,2026-05-15,10:30,confirmed
+            if (data[2].equals(this.id)) {
+                System.out.println("Appointment ID: " + data[0]);
+                System.out.println("Patient ID: " + data[1]);
+                System.out.println("Date: " + data[3]);
+                System.out.println("Time: " + data[4]);
+                System.out.println("Status: " + data[5]);
+                System.out.println("------------------");
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No appointments found.");
         }
     }
 
     public String getSpecialization() {
         return specialization;
     }
-
-    public String getDepartment() {
+    public String getDepartment(){
         return department;
+    }
+    public void viewAssignedPatients() {
+        System.out.println("=== Assigned Patients ===");
+        boolean found = false;
+
+        for (String record : patients) {
+            String[] data = record.split(",");
+            if (data[7].equals(this.id)) {
+                System.out.println("ID: " + data[0]);
+                System.out.println("Name: " + data[1]);
+                System.out.println("Phone: " + data[4]);
+                System.out.println("------------------");
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No assigned patients.");
+        }
+    }
+    public void updateAppointmentStatus(String appointmentId, String newStatus) {
+        String record = FileManager.findById("appointments", appointmentId);
+        if (record != null) {
+            Appointment app = Appointment.fromCSV(record);
+
+            if (app.getDoctorId().equals(this.id)) {
+                app.setStatus(newStatus);
+                FileManager.update("appointments", appointmentId, app.toCSV());
+                System.out.println("Status updated successfully.");
+            } else {
+                System.out.println("Error: You are not authorized to update this appointment ,you are not this appointment doctor");
+            }
+        } else {
+            System.out.println("Error: Appointment ID not found.");
+        }
     }
 }

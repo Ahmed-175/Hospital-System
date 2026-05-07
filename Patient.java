@@ -1,3 +1,5 @@
+import  java.util.List;
+import java.util.Scanner;
 
 public class Patient extends User {
 
@@ -6,8 +8,8 @@ public class Patient extends User {
     private String doctorId;
 
     public Patient(String name, String username,
-            String password, String phone,
-            int age, String gender, String doctorId) {
+                   String password, String phone,
+                   int age, String gender, String doctorId) {
 
         super(name, username, password, phone, "PATIENT");
         this.id = FileManager.generateId("patients");
@@ -63,15 +65,85 @@ public class Patient extends User {
 
     @Override
     public void viewAppointments() {
+
+        System.out.println("=== My Appointments ===");
+
+        List<String> appointments = FileManager.findAll("appointments");
+        boolean found = false;
+
+        for (String record : appointments) {
+            String[] data = record.split(",");
+
+            if (data[1].equals(this.id)) {
+                System.out.println("Appointment ID: " + data[0]);
+                System.out.println("Doctor ID: " + data[2]);
+                System.out.println("Date: " + data[3]);
+                System.out.println("Time: " + data[4]);
+                System.out.println("Status: " + data[5]);
+                System.out.println("------------------");
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No appointments found.");
+        }
     }
 
     public void viewAssignedDoctor() {
+
+        System.out.println("=== Assigned Doctor ===");
+        if (doctorId == null || doctorId.isEmpty()) {
+            System.out.println("No doctor assigned.");
+            return;
+        }
+        String doctor = FileManager.findById("doctors", doctorId);
+        if (doctor == null) {
+            System.out.println("Doctor not found.");
+            return;
+        }
+        String[] data = doctor.split(",");
+
+        System.out.println("ID: " + data[0]);
+        System.out.println("Name: " + data[1]);
+        System.out.println("Specialization: " + data[4]);
+        System.out.println("Department: " + data[5]);
+        System.out.println("Phone: " + data[6]);
     }
 
     public void bookAppointmentWithDoctor() {
+        if (doctorId == null || doctorId.isEmpty() || doctorId.equals("null")) {
+            System.out.println("Error: You cannot book an appointment without being assigned to a doctor.");
+            return;
+        }
+
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter date (yyyy-mm-dd): ");
+        String date = input.nextLine();
+        System.out.print("Enter time (hh:mm): ");
+        String time = input.nextLine();
+
+        Appointment newApp = new Appointment("temp", this.id, doctorId, date, time, "Confirmed");
     }
 
     public void cancelAppointmentWithDoctor() {
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter appointment ID: ");
+        String appId = input.nextLine();
+
+        String record = FileManager.findById("appointments", appId);
+        if (record != null) {
+            Appointment app = Appointment.fromCSV(record);
+
+            if (app.getPatientId().equals(this.id)) {
+                app.setStatus("Cancelled");
+                FileManager.update("appointments", appId, app.toCSV());
+                System.out.println("Appointment cancelled successfully.");
+            } else {
+                System.out.println("Error: This appointment does not belong to you.");
+            }
+        } else {
+            System.out.println("Error: Appointment ID not found.");
+        }
     }
 
     public String getDoctorId() {
