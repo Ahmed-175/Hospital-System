@@ -1,28 +1,31 @@
+
 import java.util.*;
-public class Admin extends User{
+
+public class Admin extends User {
     //must do:
-        //• Add a new doctor. tt
-        //• Register a new patient. tt
-        //• Assign a patient to a doctor. tt
-        //• Create an appointment. tt
-        //• View all appointments. tt
-        //• View all doctors and patients. tt
-        //• Search for a patient by ID. tt
-        //• Search for a doctor by ID. tt
-        //• Save and load data from files. tt
+    //• Add a new doctor. tt
+    //• Register a new patient. tt
+    //• Assign a patient to a doctor. tt
+    //• Create an appointment. tt
+    //• View all appointments. tt
+    //• View all doctors and patients. tt
+    //• Search for a patient by ID. tt
+    //• Search for a doctor by ID. tt
+    //• Save and load data from files. tt
     //and
-        //The admin should be able to generate simple reports about the hospital system.
-        //• The reports should include:
-            //• Total number of doctors and patients          tt
-            //• Total number of appointments (each status).   tt
-            //• Doctor with the highest number of appointments (Top 3 Doctors). tt
+    //The admin should be able to generate simple reports about the hospital system.
+    //• The reports should include:
+    //• Total number of doctors and patients          tt
+    //• Total number of appointments (each status).   tt
+    //• Doctor with the highest number of appointments (Top 3 Doctors). tt
 
     public Admin(String name, String username, String password, String phone) {
         super(name, username, password, phone, "ADMIN");
         this.id = "ADMIN123";
     }
-    public void addDoctor(String name, String username, String password,
-                          String phone, String specialization, String department) {
+
+    public static void addDoctor(String name, String username, String password,
+            String phone, String specialization, String department) {
 
         List<String> users = FileManager.findAll("users");
         for (String u : users) {
@@ -35,8 +38,9 @@ public class Admin extends User{
         new Doctor(name, username, password, phone, specialization, department);
         System.out.println("Doctor added and saved successfully.");
     }
-    public void registerPatient(String name, String username, String password,
-                                String phone, int age, String gender) {
+
+    public static void registerPatient(String name, String username, String password,
+            String phone, int age, String gender) {
         List<String> users = FileManager.findAll("users");
         for (String u : users) {
             String[] data = u.split(",");
@@ -48,7 +52,8 @@ public class Admin extends User{
         new Patient(name, username, password, phone, age, gender, "null");
         System.out.println("Patient registered and saved successfully.");
     }
-    public void assignPatientToDoctor(String patientId, String doctorId){
+
+    public static void assignPatientToDoctor(String patientId, String doctorId) {
 
         String patientData = FileManager.findById("patients", patientId);
         String doctorData = FileManager.findById("doctors", doctorId);
@@ -63,36 +68,98 @@ public class Admin extends User{
             System.out.println("Error: Patient or Doctor ID not found.");
         }
     }
-    public void createAppointment(String patientId, String doctorId, String date, String time) {
+
+    public static void createAppointment(String patientId, String doctorId, String date, String time) {
         new Appointment("temp", patientId, doctorId, date, time, "Confirmed");
     }
-    public void viewAllAppointments() {
-        List<String> list = FileManager.findAll("appointments");
-        if(list.isEmpty()){
-            System.out.println("No appointments found.");
-            return;
-        }
-        System.out.println("\n=== All Hospital Appointments ===");
-        for (String s : list) {
-            System.out.println(s);
+
+    public static void viewAllDoctors() {
+        List<String> doctors = FileManager.findAll("doctors");
+
+        System.out.println("=== All Hospital Doctors ===");
+        for (String dstr : doctors) {
+            String[] data = dstr.split(",");
+            System.out.println(" Name:" + data[1] + " Id:" + data[0]);
         }
     }
-    public void viewAllDocPat(){
+
+    public static void viewAllPatients() {
+        System.out.println("=== All Hospital Patients ===");
+        List<String> patients = FileManager.findAll("patients");
+
+        for (String pstr : patients) {
+            String[] data = pstr.split(",");
+            System.out.println(" Name:" + data[1] + " Id:" + data[0]);
+        }
+    }
+
+    public static void viewAllAppointments() {
+
+        List<String> appointments = FileManager.findAll("appointments");
+
+        if (appointments.isEmpty()) {
+            System.out.println("\nNo appointments found.");
+            return;
+        }
+
+        System.out.println("\n============== All Hospital Appointments ==============");
+
+        for (String record : appointments) {
+
+            String[] appointmentData = record.split(",");
+
+            String appointmentId = appointmentData[0];
+            String patientId = appointmentData[1];
+            String doctorId = appointmentData[2];
+            String date = appointmentData[3];
+            String time = appointmentData[4];
+            String status = appointmentData[5];
+
+            String patientRecord = FileManager.findById("patients", patientId);
+            String doctorRecord = FileManager.findById("doctors", doctorId);
+
+            String patientName = "Unknown Patient";
+            String doctorName = "Unknown Doctor";
+
+            if (patientRecord != null) {
+                String[] patientData = patientRecord.split(",");
+                patientName = patientData[1];
+            }
+
+            if (doctorRecord != null) {
+                String[] doctorData = doctorRecord.split(",");
+                doctorName = doctorData[1];
+            }
+
+            System.out.println("--------------------------------------------------");
+            System.out.println("Appointment ID : " + appointmentId);
+            System.out.println("Doctor         : Dr. " + doctorName);
+            System.out.println("Patient        : " + patientName);
+            System.out.println("Date           : " + date);
+            System.out.println("Time           : " + time);
+            System.out.println("Status         : " + status);
+        }
+
+        System.out.println("-------------------------------------------------------");
+    }
+
+    public static void viewAllDocPat() {
         List<String> doctors = FileManager.findAll("doctors");
         List<String> patients = FileManager.findAll("patients");
 
         System.out.println("=== All Hospital Doctors ===");
         for (String dstr : doctors) {
             String[] data = dstr.split(",");
-            System.out.println(" Name:"+data[1]+" Id:"+data[0]);
+            System.out.println(" Name:" + data[1] + " Id:" + data[0]);
         }
         System.out.println("=== All Hospital Patients ===");
         for (String pstr : patients) {
             String[] data = pstr.split(",");
-            System.out.println(" Name:"+data[1]+" Id:"+data[0]);
+            System.out.println(" Name:" + data[1] + " Id:" + data[0]);
         }
     }
-    public void searchPatientById(String id) {
+
+    public static  void searchPatientById(String id) {
         String data = FileManager.findById("patients", id);
         if (data != null) {
             Patient p = Patient.fromCSV(data);
@@ -101,7 +168,8 @@ public class Admin extends User{
             System.out.println("Patient not found.");
         }
     }
-    public void searchDoctorById(String id) {
+
+    public static  void searchDoctorById(String id) {
         String data = FileManager.findById("doctors", id);
         if (data != null) {
             Doctor d = Doctor.fromCSV(data);
@@ -110,7 +178,8 @@ public class Admin extends User{
             System.out.println("Doctor not found.");
         }
     }
-    public void generateReports() {
+
+    public static  void generateReports() {
         List<String> doctors = FileManager.findAll("doctors");
         List<String> patients = FileManager.findAll("patients");
         List<String> apps = FileManager.findAll("appointments");
@@ -125,13 +194,11 @@ public class Admin extends User{
 
         for (String astr : apps) {
             String[] data = astr.split(",");
-            if(data[5].equalsIgnoreCase("CONFIRMED")){
+            if (data[5].equalsIgnoreCase("CONFIRMED")) {
                 appCONFIRMED++;
-            }
-            else if(data[5].equalsIgnoreCase("PENDING")){
+            } else if (data[5].equalsIgnoreCase("PENDING")) {
                 appPENDING++;
-            }
-            else{
+            } else {
                 appCANCELLED++;
             }
         }
@@ -147,8 +214,8 @@ public class Admin extends User{
             String dId = dData[0]; // id
 
             int c = 0;
-            for(String app : apps){
-                if(app.split(",")[2].equals(dId)){// app.split(",") hyasem elsattr ly parts ,,[2] tany goz2 fy el parts el hwa el doc id
+            for (String app : apps) {
+                if (app.split(",")[2].equals(dId)) {// app.split(",") hyasem elsattr ly parts ,,[2] tany goz2 fy el parts el hwa el doc id
                     c++;
                 }
             }
@@ -161,7 +228,7 @@ public class Admin extends User{
             int maxIndex = -1;
 
             // get max value
-            for(int i = 0; i < counts.length; i++) {
+            for (int i = 0; i < counts.length; i++) {
                 if (counts[i] > maxVal) {//lw el rakam ely fy elcounts array akbar 7ootoh fy maxval
                     maxVal = counts[i];
                     maxIndex = i;//aked 2oly mkan el mac value fy elarray
