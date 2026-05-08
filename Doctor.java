@@ -1,4 +1,6 @@
+
 import java.util.*;
+
 public class Doctor extends User {
 
     private String specialization;
@@ -7,8 +9,8 @@ public class Doctor extends User {
     private List<String> appointments;
 
     public Doctor(String name, String username,
-                  String password, String phone,
-                  String specialization, String department) {
+            String password, String phone,
+            String specialization, String department, boolean save) {
 
         super(name, username, password, phone, "DOCTOR");
 
@@ -17,9 +19,11 @@ public class Doctor extends User {
         this.department = department;
         this.patients = FileManager.findAll("patients");
         this.appointments = FileManager.findAll("appointments");
+        if (save) {
 
-        FileManager.save("doctors", this.toCSV());
-        FileManager.save("users", this.userToCSV());
+            FileManager.save("doctors", this.toCSV());
+            FileManager.save("users", this.userToCSV());
+        }
     }
 
     public String toCSV() {
@@ -42,7 +46,8 @@ public class Doctor extends User {
                 data[3], // password
                 data[6], // phone
                 data[4], // specialization
-                data[5]  // department
+                data[5], // department
+                false
         );
         doctor.setId(data[0]);
         return doctor;
@@ -50,7 +55,6 @@ public class Doctor extends User {
 
     @Override
     public void viewPersonalInfo() {
-        System.out.println("=== Doctor Info ===");
         System.out.println("ID: " + id);
         System.out.println("Name: " + name);
         System.out.println("Username: " + username);
@@ -58,9 +62,9 @@ public class Doctor extends User {
         System.out.println("Department: " + department);
         System.out.println("Phone: " + phone);
     }
+
     @Override
     public void viewAppointments() {
-        System.out.println("=== My Appointments ===");
         boolean found = false;
 
         for (String record : appointments) {
@@ -85,11 +89,12 @@ public class Doctor extends User {
     public String getSpecialization() {
         return specialization;
     }
-    public String getDepartment(){
+
+    public String getDepartment() {
         return department;
     }
+
     public void viewAssignedPatients() {
-        System.out.println("=== Assigned Patients ===");
         boolean found = false;
 
         for (String record : patients) {
@@ -106,10 +111,12 @@ public class Doctor extends User {
             System.out.println("No assigned patients.");
         }
     }
+
     public void updateAppointmentStatus(String appointmentId, String newStatus) {
         String record = FileManager.findById("appointments", appointmentId);
         if (record != null) {
             Appointment app = Appointment.fromCSV(record);
+            System.out.println("Status : " + app.getStatus());
 
             if (app.getDoctorId().equals(this.id)) {
                 app.setStatus(newStatus);

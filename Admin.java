@@ -35,7 +35,7 @@ public class Admin extends User {
                 return;
             }
         }
-        new Doctor(name, username, password, phone, specialization, department);
+        new Doctor(name, username, password, phone, specialization, department , true);
         System.out.println("Doctor added and saved successfully.");
     }
 
@@ -70,7 +70,7 @@ public class Admin extends User {
     }
 
     public static void createAppointment(String patientId, String doctorId, String date, String time) {
-        new Appointment("temp", patientId, doctorId, date, time, "Confirmed");
+       Appointment.create(patientId, doctorId, date, time, "Confirmed" );
     }
 
     public static void viewAllDoctors() {

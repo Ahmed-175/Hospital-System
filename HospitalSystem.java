@@ -35,11 +35,10 @@ public class HospitalSystem {
                         loginAdmin();
 
                     case 2 ->
-                        System.out.println("Doctor Login Method");
+                        loginDoctor();
 
                     case 3 ->
-                        System.out.println("Patient Login Method");
-
+                        loginPatient();
                     case 4 ->
                         System.out.println("Exiting System...");
 
@@ -288,5 +287,265 @@ public class HospitalSystem {
             }
 
         } while (userChoice != 11);
+    }
+
+    private static void loginDoctor() {
+
+        System.out.println("\n============== Doctor Login ==============");
+
+        System.out.print("Enter username: ");
+        String username = input.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = input.nextLine();
+
+        List<String> users = FileManager.findAll("users");
+
+        for (String record : users) {
+
+            // D001,Ahmed,ahmed123,1234,01000000000,DOCTOR
+            String[] userData = record.split(",");
+
+            String dbUsername = userData[2];
+            String dbPassword = userData[3];
+            String role = userData[5];
+
+            if (dbUsername.equals(username)
+                    && dbPassword.equals(password)
+                    && role.equalsIgnoreCase("DOCTOR")) {
+
+                String doctorRecord = FileManager.findById("doctors", userData[0]);
+
+                if (doctorRecord != null) {
+
+                    Doctor doctor = Doctor.fromCSV(doctorRecord);
+
+                    System.out.println("\nLogin Successful.");
+
+                    doctorMenu(doctor);
+
+                    return;
+                }
+            }
+        }
+
+        System.out.println("\nInvalid username or password.");
+    }
+
+    private static void doctorMenu(Doctor doctor) {
+
+        int userChoice = 0;
+
+        do {
+
+            System.out.println("\n==================================================");
+            System.out.println(" Welcome Dr. " + doctor.name);
+            System.out.println("==================================================");
+
+            System.out.println("1- View My Profile");
+            System.out.println("2- View Assigned Patients");
+            System.out.println("3- View My Appointments");
+            System.out.println("4- Update Appointment Status");
+            System.out.println("5- Logout");
+
+            System.out.print("Enter your choice (1-5): ");
+
+            try {
+
+                userChoice = input.nextInt();
+                input.nextLine();
+                switch (userChoice) {
+                    case 1 -> {
+                        System.out.println("\n============= My Profile =============");
+                        doctor.viewPersonalInfo();
+                    }
+                    case 2 -> {
+                        System.out.println("\n========== Assigned Patients ==========");
+                        doctor.viewAssignedPatients();
+                    }
+                    case 3 -> {
+                        System.out.println("\n=========== My Appointments ===========");
+                        doctor.viewAppointments();
+                    }
+                    case 4 -> {
+
+                        System.out.println("\n======= Update Appointment Status =======");
+
+                        System.out.print("Enter appointment ID: ");
+                        String appointmentId = input.nextLine();
+
+                        System.out.println("\nChoose Appointment Status:");
+                        System.out.println("1- CONFIRMED");
+                        System.out.println("2- DONE");
+                        System.out.println("3- CANCELLED");
+
+                        System.out.print("Enter your choice (1-3): ");
+
+                        int statusChoice = input.nextInt();
+                        input.nextLine();
+
+                        String newStatus = "CONFIRMED";
+
+                        switch (statusChoice) {
+
+                            case 1 ->
+                                newStatus = "CONFIRMED";
+
+                            case 2 ->
+                                newStatus = "DONE";
+
+                            case 3 ->
+                                newStatus = "CANCELLED";
+
+                            default -> {
+
+                                System.out.println("Invalid status choice.");
+                                break;
+                            }
+                        }
+
+                        doctor.updateAppointmentStatus(
+                                appointmentId,
+                                newStatus
+                        );
+                    }
+                    case 5 -> {
+
+                        System.out.println("\nLogged out successfully.");
+                    }
+
+                    default -> {
+
+                        if (userChoice < 1 || userChoice > 5) {
+                            System.out.println("Please enter a number between 1 and 5.");
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+
+                System.out.println("Invalid input! Please enter numbers only.");
+                input.nextLine();
+            }
+
+        } while (userChoice != 5);
+    }
+
+    private static void loginPatient() {
+
+        System.out.println("\n============== Patient Login ==============");
+
+        System.out.print("Enter username: ");
+        String username = input.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = input.nextLine();
+
+        List<String> users = FileManager.findAll("users");
+
+        for (String record : users) {
+
+            // P001,Ahmed Ali,ahmedA,1234,01011112222,PATIENT
+            String[] userData = record.split(",");
+
+            String dbUsername = userData[2];
+            String dbPassword = userData[3];
+            String role = userData[5];
+
+            if (dbUsername.equals(username)
+                    && dbPassword.equals(password)
+                    && role.equalsIgnoreCase("Patient")) {
+
+                System.out.println("\nLogin Successful.");
+
+                patientMenu(userData[1]);
+                return;
+            }
+        }
+
+        System.out.println("\nInvalid username or password.");
+    }
+
+    private static void patientMenu(String patientName) {
+
+        System.out.println("\n==================================================");
+        System.out.println(" Welcome " + patientName + " To Patient Dashboard ");
+        System.out.println("==================================================");
+
+        List<String> p = FileManager.findAll("patients");
+        Patient patient = null;
+        for (String record : p) {
+            String[] pParts = record.split(",");
+            if (pParts[1].equals(patientName)) {
+                patient = Patient.fromCSV(record);
+            }
+        }
+
+        int userChoice = 0;
+
+        do {
+
+            System.out.println("\n================ Patient Menu ================");
+            System.out.println("1- viewPersonalInfo");
+            System.out.println("2- viewAppointments");
+            System.out.println("3- viewAssignedDoctor");
+            System.out.println("4- bookAppointmentWithDoctor");
+            System.out.println("5- cancelAppointmentWithDoctor");
+            System.out.println("6- getDoctorId");
+            System.out.println("7- Logout");
+
+            System.out.print("Enter your choice (1-7): ");
+
+            try {
+
+                userChoice = input.nextInt();
+                input.nextLine();
+
+                switch (userChoice) {
+
+                    case 1 -> {
+                        patient.viewPersonalInfo();
+                    }
+
+                    case 2 -> {
+                        patient.viewAppointments();
+                    }
+
+                    case 3 -> {
+                        patient.viewAssignedDoctor();
+                    }
+
+                    case 4 -> {
+                        patient.bookAppointmentWithDoctor();
+                    }
+
+                    case 5 -> {
+                        patient.cancelAppointmentWithDoctor();
+                    }
+
+                    case 6 -> {
+                        patient.getDoctorId();
+                    }
+
+                    case 7 -> {
+                        System.out.println("\nLogged out successfully.");
+                        break;
+                    }
+
+                    default -> {
+
+                        if (userChoice < 1 || userChoice > 7) {
+                            System.out.println("Please enter a number between 1 and 7.");
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+
+                System.out.println("Invalid input! Please enter numbers only.");
+                input.nextLine();
+            }
+
+        } while (userChoice != 7);
     }
 }
