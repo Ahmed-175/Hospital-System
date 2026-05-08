@@ -48,7 +48,7 @@ public class Admin extends User{
         new Patient(name, username, password, phone, age, gender, "null");
         System.out.println("Patient registered and saved successfully.");
     }
-    public void assignPatientToDoctor(String patientId, String doctorId) {
+    public void assignPatientToDoctor(String patientId, String doctorId){
 
         String patientData = FileManager.findById("patients", patientId);
         String doctorData = FileManager.findById("doctors", doctorId);
