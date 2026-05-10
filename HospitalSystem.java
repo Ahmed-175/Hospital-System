@@ -11,7 +11,7 @@ public class HospitalSystem {
         System.out.println("==================================================");
         System.out.println(" Welcome to Hospital Management System ");
         System.out.println("==================================================");
-
+        
         int userChoice = 0;
 
         do {
@@ -207,8 +207,6 @@ public class HospitalSystem {
                         System.out.print("Enter patient ID: ");
                         String patientId = input.nextLine();
 
-                        System.out.print("Enter doctor ID: ");
-                        String doctorId = input.nextLine();
 
                         System.out.print("Enter appointment date: ");
                         String date = input.nextLine();
@@ -218,7 +216,6 @@ public class HospitalSystem {
 
                         Admin.createAppointment(
                                 patientId,
-                                doctorId,
                                 date,
                                 time
                         );
@@ -458,7 +455,7 @@ public class HospitalSystem {
 
                 System.out.println("\nLogin Successful.");
 
-                patientMenu(userData[1]);
+                patientMenu(userData[0]);
                 return;
             }
         }
@@ -466,35 +463,28 @@ public class HospitalSystem {
         System.out.println("\nInvalid username or password.");
     }
 
-    private static void patientMenu(String patientName) {
+    private static void patientMenu(String id) {
+        String record =  FileManager.findById("patients", id);
+        Patient patient = Patient.fromCSV(record);
+
 
         System.out.println("\n==================================================");
-        System.out.println(" Welcome " + patientName + " To Patient Dashboard ");
+        System.out.println(" Welcome " + patient.name + " To Patient Dashboard ");
         System.out.println("==================================================");
-
-        List<String> p = FileManager.findAll("patients");
-        Patient patient = null;
-        for (String record : p) {
-            String[] pParts = record.split(",");
-            if (pParts[1].equals(patientName)) {
-                patient = Patient.fromCSV(record);
-            }
-        }
 
         int userChoice = 0;
 
         do {
 
             System.out.println("\n================ Patient Menu ================");
-            System.out.println("1- viewPersonalInfo");
-            System.out.println("2- viewAppointments");
-            System.out.println("3- viewAssignedDoctor");
-            System.out.println("4- bookAppointmentWithDoctor");
-            System.out.println("5- cancelAppointmentWithDoctor");
-            System.out.println("6- getDoctorId");
-            System.out.println("7- Logout");
+            System.out.println("1- View Personal Info");
+            System.out.println("2- View Appointments");
+            System.out.println("3- View Assigned Doctor");
+            System.out.println("4- Book Appointment With Doctor");
+            System.out.println("5- Cancel Appointment With Doctor");
+            System.out.println("6- Logout");
 
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-6): ");
 
             try {
 
@@ -524,18 +514,14 @@ public class HospitalSystem {
                     }
 
                     case 6 -> {
-                        patient.getDoctorId();
-                    }
-
-                    case 7 -> {
                         System.out.println("\nLogged out successfully.");
                         break;
                     }
 
                     default -> {
 
-                        if (userChoice < 1 || userChoice > 7) {
-                            System.out.println("Please enter a number between 1 and 7.");
+                        if (userChoice < 1 || userChoice > 6) {
+                            System.out.println("Please enter a number between 1 and 6.");
                         }
                     }
                 }
@@ -546,6 +532,6 @@ public class HospitalSystem {
                 input.nextLine();
             }
 
-        } while (userChoice != 7);
+        } while (userChoice != 6);
     }
 }

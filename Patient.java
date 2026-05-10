@@ -1,4 +1,5 @@
-import  java.util.List;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class Patient extends User {
@@ -7,31 +8,34 @@ public class Patient extends User {
     private String gender;
     private String doctorId;
 
-    public Patient(String name, String username,
-                   String password, String phone,
-                   int age, String gender, String doctorId) {
+    public Patient(String id, String name, String username,
+            String password, String phone,
+            int age, String gender, String doctorId) {
 
         super(name, username, password, phone, "PATIENT");
-        this.id = FileManager.generateId("patients");
-
+        this.id = id;
         this.age = age;
         this.gender = gender;
         this.doctorId = doctorId;
-        FileManager.save("patients", this.toCSV());
-        FileManager.save("users", this.userToCSV());
+    }
 
+    public void create() {
+
+        this.id = FileManager.generateId("patients");
+        String patient = this.toCSV();
+        FileManager.save("patients", patient);
     }
 
     public static Patient fromCSV(String record) {
-
         String[] data = record.split(",");
         Patient patient = new Patient(
+                data[0], // id
                 data[1], // name
                 data[2], // username
                 data[3], // password
                 data[4], // phone
                 Integer.parseInt(data[5]), // age
-                data[6], // gender
+                data[6],
                 data[7] // doctorId
         );
 
@@ -122,7 +126,8 @@ public class Patient extends User {
         System.out.print("Enter time (hh:mm): ");
         String time = input.nextLine();
 
-        Appointment newApp = new Appointment("temp", this.id, doctorId, date, time, "Confirmed");
+        Appointment.create(this.id, date, time, "PENDING");
+        System.out.println("successful");
     }
 
     public void cancelAppointmentWithDoctor() {

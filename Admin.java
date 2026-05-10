@@ -49,7 +49,8 @@ public class Admin extends User {
                 return;
             }
         }
-        new Patient(name, username, password, phone, age, gender, "null");
+        Patient p =  new Patient("",name, username, password, phone, age, gender, "null");
+        p.create();
         System.out.println("Patient registered and saved successfully.");
     }
 
@@ -69,8 +70,8 @@ public class Admin extends User {
         }
     }
 
-    public static void createAppointment(String patientId, String doctorId, String date, String time) {
-       Appointment.create(patientId, doctorId, date, time, "Confirmed" );
+    public static void createAppointment(String patientId, String date, String time) {
+       Appointment.create(patientId, date, time, "Confirmed" );
     }
 
     public static void viewAllDoctors() {

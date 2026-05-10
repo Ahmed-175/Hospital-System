@@ -41,11 +41,12 @@ public class Appointment {
 
     public static Appointment create(
             String patientId,
-            String doctorId,
             String date,
             String time,
             String status
     ) {
+
+        String[] patient= FileManager.findById("patients",patientId).split(",");
 
         if (date == null || date.isEmpty()
                 || time == null || time.isEmpty()) {
@@ -59,7 +60,7 @@ public class Appointment {
         Appointment app = new Appointment(
                 id,
                 patientId,
-                doctorId,
+                patient[7],
                 date,
                 time,
                 status

@@ -12,9 +12,11 @@ public class FileManager {
 
     private static void initDatabase() {
         File folder = new File(DB_FOLDER);
+
         if (!folder.exists()) {
             folder.mkdir();
         }
+    
         createFile("users.txt");
         createFile("doctors.txt");
         createFile("patients.txt");
@@ -38,6 +40,7 @@ public class FileManager {
 
     public static List<String> findAll(String collection) {
         List<String> data = new ArrayList<>();
+        
         try (Scanner scanner = new Scanner(getFile(collection))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
@@ -109,7 +112,7 @@ public class FileManager {
     }
 
     public static String generateId(String collection) {
-        List<String> data = findAll(collection);
+        List<String> data = findAll(collection); // doctor .// D
         String prefix = String.valueOf(collection.charAt(0)).toUpperCase();
         return prefix + String.format("%03d", (data.size() + 1));
     }
